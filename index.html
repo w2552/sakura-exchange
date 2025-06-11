@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAKURA - Japan's Premier Crypto Exchange</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            background: #ffffff;
+            border-radius: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            overflow: hidden;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .status-bar {
+            height: 44px;
+            background: linear-gradient(90deg, #000 0%, #1a1a1a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .signal-icons {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        /* 启动页面 */
+        .splash-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: all 0.8s ease;
+        }
+
+        .splash-screen.hidden {
+            opacity: 0;
+            transform: translateY(-100%);
+        }
+
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 40px;
+            animation: logoAnimation 2s ease-out;
+        }
+
+        .sakura-logo {
+            width: 120px;
+            height: 120px;
+            position: relative;
+            animation: sakuraFloat 3s ease-in-out infinite;
+        }
+
+        .sakura-logo svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 8px 16px rgba(0,0,0,0.2));
+        }
+
+        .app-title {
+            font-size: 48px;
+            font-weight: 800;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            letter-spacing: 2px;
+        }
+
+        .tagline {
+            color: rgba(255,255,255,0.9);
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInUp 1.5s ease-out;
+            max-width: 280px;
+            line-height: 1.4;
+        }
+
+        .get-started-btn {
+            background: white;
+            color: #ff6b35;
+            border: none;
+            padding: 18px 45px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .get-started-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        /* 登录注册页面 */
+        .auth-screen {
+            position: absolute;
+            top: 44px;
+            left: 0;
+            width: 100%;
+            height: calc(100% - 44px);
+            background: white;
+            z-index: 100;
+            transform: translateY(100%);
+            transition: all 0.5s ease;
+            overflow-y: auto;
+        }
+
+        .auth-screen.active {
+            transform: translateY(0);
+        }
+
+        .auth-header {
+            padding: 40px 30px 20px;
+            text-align: center;
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            color: white;
+            position: relative;
+        }
+
+        .auth-header::before {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+        }
+
+        .auth-header .small-sakura {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 15px;
+        }
+
+        .auth-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .auth-header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .auth-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-radius: 25px;
+            margin: 30px 30px 20px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background: transparent;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #666;
+        }
+
+        .auth-tab.active {
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            color: white;
+        }
+
+        .auth-form {
+            padding: 0 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #ff6b35;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        .google-btn {
+            width: 100%;
+            padding: 16px;
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .google-btn:hover {
+            border-color: #4285f4;
+            box-shadow: 0 2px 10px rgba(66, 133, 244, 0.2);
+        }
+
+        .google-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 30px 0;
+            position: relative;
+            color: #666;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e1e5e9;
+            z-index: 1;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.3);
+        }
+
+        .forgot-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .forgot-link a {
+            color: #ff6b35;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .privacy-text {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            margin-top: 30px;
+            line-height: 1.5;
+        }
+
+        .privacy-text a {
+            color: #ff6b35;
+            text-decoration: none;
+        }
+
+        .login-form, .register-form {
+            display: none;
+        }
+
+        .login-form.active, .register-form.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .loading {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            padding: 20px;
+        }
+
+        .loading.active {
+            display: flex;
+        }
+
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ff6b35;
+            animation: loadingDots 1.4s infinite ease-in-out both;
+        }
+
+        .loading-dot:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        /* 动画 */
+        @keyframes logoAnimation {
+            0% {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes sakuraFloat {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes loadingDots {
+            0%, 80%, 100% {
+                transform: scale(0);
+            }
+            40% {
+                transform: scale(1);
+            }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .phone-container {
+                width: 100%;
+                max-width: 375px;
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+
+        /* 成功提示 */
+        .success-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center;
+            z-index: 2000;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .success-icon {
+            font-size: 48px;
+            color: #28a745;
+            margin-bottom: 15px;
+        }
+
+        /* 樱花花瓣飘落动画 */
+        .sakura-petal {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 192, 203, 0.7);
+            border-radius: 50% 0;
+            animation: fall 8s infinite linear;
+            z-index: 10;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <!-- 状态栏 -->
+        <div class="status-bar">
+            <div class="time">9:41</div>
+            <div class="signal-icons">
+                <i class="fas fa-signal"></i>
+                <i class="fas fa-wifi"></i>
+                <i class="fas fa-battery-three-quarters"></i>
+            </div>
+        </div>
+
+        <!-- 启动页面 -->
+        <div class="splash-screen" id="splashScreen">
+            <div class="logo-container">
+                <div class="sakura-logo">
+                    <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                        <!-- 樱花花瓣 -->
+                        <g transform="translate(60,60)">
+                            <!-- 花瓣1 - 顶部 -->
+                            <path d="M0,-40 C-15,-55 -25,-35 -10,-25 C-5,-20 5,-20 10,-25 C25,-35 15,-55 0,-40Z" 
+                                  fill="#FFB7C5" stroke="#FF69B4" stroke-width="0.5"/>
+                            
+                            <!-- 花瓣2 - 右上（比特币花瓣） -->
+                            <g transform="rotate(72)">
+                                <path d="M0,-40 C-15,-55 -25,-35 -10,-25 C-5,-20 5,-20 10,-25 C25,-35 15,-55 0,-40Z" 
+                                      fill="#FFD700" stroke="#FF8C00" stroke-width="0.5"/>
+                                <!-- 比特币符号 -->
+                                <text x="0" y="-30" text-anchor="middle" font-family="Arial, sans-serif" 
+                                      font-size="12" font-weight="bold" fill="#FF4500">₿</text>
+                            </g>
+                            
+                            <!-- 花瓣3 - 右下 -->
+                            <g transform="rotate(144)">
+                                <path d="M0,-40 C-15,-55 -25,-35 -10,-25 C-5,-20 5,-20 10,-25 C25,-35 15,-55 0,-40Z" 
+                                      fill="#FFB7C5" stroke="#FF69B4" stroke-width="0.5"/>
+                            </g>
+                            
+                            <!-- 花瓣4 - 左下 -->
+                            <g transform="rotate(216)">
+                                <path d="M0,-40 C-15,-55 -25,-35 -10,-25 C-5,-20 5,-20 10,-25 C25,-35 15,-55 0,-40Z" 
+                                      fill="#FFB7C5" stroke="#FF69B4" stroke-width="0.5"/>
+                            </g>
+                            
+                            <!-- 花瓣5 - 左上 -->
+                            <g transform="rotate(288)">
+                                <path d="M0,-40 C-15,-55 -25,-35 -10,-25 C-5,-20 5,-20 10,-25 C25,-35 15,-55 0,-40Z" 
+                                      fill="#FFB7C5" stroke="#FF69B4" stroke-width="0.5"/>
+                            </g>
+                            
+                            <!-- 花心 -->
+                            <circle cx="0" cy="0" r="8" fill="#FFF8DC" stroke="#FFD700" stroke-width="1"/>
+                            
+                            <!-- 花蕊 -->
+                            <circle cx="-2" cy="-2" r="1.5" fill="#FFD700"/>
+                            <circle cx="2" cy="-1" r="1.5" fill="#FFD700"/>
+                            <circle cx="0" cy="2" r="1.5" fill="#FFD700"/>
+                        </g>
+                    </svg>
+                </div>
+                <div class="app-title">SAKURA</div>
+            </div>
+            <p class="tagline">Japan's Premier Cryptocurrency Exchange<br>Secure • Fast • Regulated</p>
+            <button class="get-started-btn" onclick="showAuthScreen()">
+                Get Started
+            </button>
+        </div>
+
+        <!-- 登录注册页面 -->
+        <div class="auth-screen" id="authScreen">
+            <div class="auth-header">
+                <div class="small-sakura">
+                    <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                        <g transform="translate(20,20)">
+                            <path d="M0,-12 C-5,-16 -8,-10 -3,-7 C-1,-5 1,-5 3,-7 C8,-10 5,-16 0,-12Z" 
+                                  fill="white" opacity="0.9"/>
+                            <g transform="rotate(72)">
+                                <path d="M0,-12 C-5,-16 -8,-10 -3,-7 C-1,-5 1,-5 3,-7 C8,-10 5,-16 0,-12Z" 
+                                      fill="white" opacity="0.9"/>
+                            </g>
+                            <g transform="rotate(144)">
+                                <path d="M0,-12 C-5,-16 -8,-10 -3,-7 C-1,-5 1,-5 3,-7 C8,-10 5,-16 0,-12Z" 
+                                      fill="white" opacity="0.9"/>
+                            </g>
+                            <g transform="rotate(216)">
+                                <path d="M0,-12 C-5,-16 -8,-10 -3,-7 C-1,-5 1,-5 3,-7 C8,-10 5,-16 0,-12Z" 
+                                      fill="white" opacity="0.9"/>
+                            </g>
+                            <g transform="rotate(288)">
+                                <path d="M0,-12 C-5,-16 -8,-10 -3,-7 C-1,-5 1,-5 3,-7 C8,-10 5,-16 0,-12Z" 
+                                      fill="white" opacity="0.9"/>
+                            </g>
+                            <circle cx="0" cy="0" r="2.5" fill="white"/>
+                        </g>
+                    </svg>
+                </div>
+                <h1>Welcome to SAKURA</h1>
+                <p>Japan's Most Trusted Crypto Trading Platform</p>
+            </div>
+
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="showLogin()">Sign In</button>
+                <button class="auth-tab" onclick="showRegister()">Sign Up</button>
+            </div>
+
+            <div class="auth-form">
+                <!-- 谷歌登录按钮 -->
+                <button class="google-btn" onclick="googleLogin()">
+                    <svg class="google-icon" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Continue with Google
+                </button>
+
+                <div class="divider">
+                    <span>or</span>
+                </div>
+
+                <!-- 登录表单 -->
+                <form class="login-form active" id="loginForm">
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-input" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" placeholder="Enter your password" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Sign In</button>
+                    <div class="forgot-link">
+                        <a href="#" onclick="forgotPassword()">Forgot Password?</a>
+                    </div>
+                </form>
+
+                <!-- 注册表单 -->
+                <form class="register-form" id="registerForm">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-input" placeholder="Enter your full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-input" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" placeholder="Create password (min 8 characters)" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Confirm Password</label>
+                        <input type="password" class="form-input" placeholder="Confirm your password" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Create Account</button>
+                </form>
+
+                <div class="privacy-text">
+                    By signing up, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                </div>
+            </div>
+
+            <!-- 加载动画 -->
+            <div class="loading" id="loading">
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 成功提示 -->
+    <div class="success-message" id="successMessage">
+        <div class="success-icon">✓</div>
+        <h3>Success!</h3>
+        <p>Welcome to SAKURA Exchange</p>
+    </div>
+
+    <script>
+        // 页面切换功能
+        function showAuthScreen() {
+            document.getElementById('splashScreen').classList.add('hidden');
+            setTimeout(() => {
+                document.getElementById('authScreen').classList.add('active');
+            }, 400);
+        }
+
+        function showLogin() {
+            document.querySelectorAll('.auth-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.auth-tab')[0].classList.add('active');
+            
+            document.getElementById('loginForm').classList.add('active');
+            document.getElementById('registerForm').classList.remove('active');
+        }
+
+        function showRegister() {
+            document.querySelectorAll('.auth-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.auth-tab')[1].classList.add('active');
+            
+            document.getElementById('registerForm').classList.add('active');
+            document.getElementById('loginForm').classList.remove('active');
+        }
+
+        // 谷歌登录功能
+        function googleLogin() {
+            showLoading();
+            
+            // 模拟谷歌登录过程
+            setTimeout(() => {
+                hideLoading();
+                showSuccessMessage('Google Sign In Successful!');
+            }, 2000);
+        }
+
+        // 表单提交
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            showLoading();
+            
+            setTimeout(() => {
+                hideLoading();
+                showSuccessMessage('Login Successful!');
+            }, 1500);
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const passwords = this.querySelectorAll('input[type="password"]');
+            
+            if (passwords[0].value !== passwords[1].value) {
+                alert('Passwords do not match. Please check and try again.');
+                return;
+            }
+            
+            if (passwords[0].value.length < 8) {
+                alert('Password must be at least 8 characters long.');
+                return;
+            }
+            
+            showLoading();
+            
+            setTimeout(() => {
+                hideLoading();
+                showSuccessMessage('Account Created Successfully!');
+            }, 2000);
+        });
+
+        // 忘记密码
+        function forgotPassword() {
+            const email = prompt('Please enter your email address:');
+            if (email && email.includes('@')) {
+                showLoading();
+                setTimeout(() => {
+                    hideLoading();
+                    showSuccessMessage('Password reset email sent!');
+                }, 1500);
+            } else if (email) {
+                alert('Please enter a valid email address.');
+            }
+        }
+
+        // 工具函数
+        function showLoading() {
+            document.getElementById('loading').classList.add('active');
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').classList.remove('active');
+        }
+
+        function showSuccessMessage(message) {
+            const successMsg = document.getElementById('successMessage');
+            successMsg.querySelector('p').textContent = message;
+            successMsg.classList.add('show');
+            
+            setTimeout(() => {
+                successMsg.classList.remove('show');
+            }, 3000);
+        }
+
+        // 樱花花瓣飘落效果
+        function createSakuraPetal() {
+            const petal = document.createElement('div');
+            petal.className = 'sakura-petal';
+            petal.style.left = Math.random() * 100 + '%';
+            petal.style.animationDuration = (Math.random() * 3 + 5) + 's';
+            petal.style.animationDelay = Math.random() * 2 + 's';
+            
+            document.querySelector('.splash-screen').appendChild(petal);
+            
+            setTimeout(() => {
+                petal.remove();
+            }, 8000);
+        }
+
+        // 定期创建樱花花瓣
+        setInterval(createSakuraPetal, 1000);
+
+        // 输入框焦点效果
+        document.querySelectorAll('.form-input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.classList.add('focused');
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.classList.remove('focused');
+            });
+        });
+
+        // 添加键盘快捷键
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                // ESC键返回启动页面
+                document.getElementById('authScreen').classList.remove('active');
+                document.getElementById('splashScreen').classList.remove('hidden');
+            }
+        });
+
+        // 页面加载完成后的欢迎效果
+        window.addEventListener('load', function() {
+            console.log('Welcome to SAKURA Exchange - Japan\'s Premier Crypto Platform');
+        });
+    </script>
+</body>
+</html>
